@@ -1,14 +1,14 @@
 {
   "name": "ws-module-angular7",
-  "version": "0.0.2",
+  "version": "0.0.18",
   "description": "",
   "main": "index.js",
   "scripts": {
     "tsc": "tsc",
-    "build": "rm -rf package && npm run tsc && npm run copyVo && npm run copyScripts",
-    "copyVo": "cp -r ./src/vo/ ./package/vo/",
+    "build": "rm -rf package && npm run tsc && npm run copyScripts && npm run copyPackage",
     "copyScripts": "cp -r ./src/scripts/ ./package/scripts/",
-    "publishPackage": "npm run build && npm publish",
+    "copyPackage": "cp ./package.json ./package/",
+    "publishPackage": "npm run build && npm publish package",
     "postinstall": "node ./scripts/add_scripts.js"
   },
   "bin": {
@@ -18,14 +18,15 @@
   "author": "Luca Brognara",
   "license": "ISC",
   "dependencies": {
-    "@angular/common": "^7.1.4",
-    "@angular/core": "^7.1.4",
-    "@angular/http": "^7.1.4",
-    "@angular/platform-browser": "^7.1.4",
+    "@angular/common": "^7.0.4",
+    "@angular/core": "^7.0.4",
+    "@angular/http": "^7.0.4",
+    "@angular/platform-browser": "^7.0.4",
+    "@types/signals": "^1.0.1",
     "lucabro-linked-list": "^1.0.29",
     "rxjs": "^6.3.3",
     "signals": "^1.0.0",
-    "@types/signals": "^1.0.1",
+    "ws-module-common": "0.0.1",
     "zone.js": "^0.8.26"
   },
   "devDependencies": {

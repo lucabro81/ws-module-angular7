@@ -1,9 +1,8 @@
-import {RequestVO} from "../../../vo/RequestVO";
 import {AbsListener} from "../Listener/AbsListener";
 import {WarningLevel} from "../../../utils/Emun";
 import {RequestManager} from "../System/RequestManager";
 import {Configuration} from "../../SetConfig";
-import {ResponseVO} from "../../../vo/ResponseVO";
+import { RequestVO, ResponseVO } from "ws-module-common";
 
 export class AbsHandlerManager {
 

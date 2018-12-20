@@ -14,12 +14,3 @@ export * from "./core/services/System/IService";
 export * from "./core/services/System/RequestManager";
 
 export * from "./core/SetConfig";
-
-export * from "./vo/BtnAlertStructureVO";
-export * from "./vo/ConfigVO";
-export * from "./vo/DefaultAlertStructureVO";
-export * from "./vo/GetListServiceParamsVO";
-export * from "./vo/OverrideRequestDataVO";
-export * from "./vo/RequestVO";
-export * from "./vo/ResponseVO";
-export * from "./vo/SubjectContVO";

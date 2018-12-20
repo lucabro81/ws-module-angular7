@@ -4,12 +4,10 @@ import { LinkedList } from "lucabro-linked-list/package/LinkedList";
 import { ListElement } from "lucabro-linked-list/package/ListElement";
 import { AbsListener } from "../Listener/AbsListener";
 import { Listener } from "../Listener/Listener";
-import { RequestVO } from "../../../vo/RequestVO";
 import { IListener } from "../Listener/IListener";
-import { SubjectContVO } from "../../../vo/SubjectContVO";
-import { GetListServiceParamsVO } from "../../../vo/GetListServiceParamsVO";
 import { Observable, Subject } from "rxjs";
 import { distinctUntilChanged, debounceTime } from 'rxjs/operators';
+import { GetListServiceParamsVO, RequestVO, SubjectContVO } from "ws-module-common";
 
 interface RequestManagerHashVO<R, T extends AbsListener> {
     [id: string]: RequestManager<R, T>

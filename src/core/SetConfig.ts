@@ -1,4 +1,4 @@
-import {ConfigVO} from "../vo/ConfigVO";
+import { ConfigVO } from "ws-module-common";
 
 export var Configuration:ConfigVO = <ConfigVO>{};
 

@@ -1,7 +1,5 @@
 import { WarningLevel } from "../../../utils/Emun";
 import { Signal } from "signals";
-import { RequestVO } from "../../../vo/RequestVO";
-import { OverrideRequestDataVO } from "../../../vo/OverrideRequestDataVO";
 
 import {AbsListener} from "../Listener/AbsListener";
 import {AbsHandlerManager} from "./AbsHandlerManager";
@@ -10,10 +8,9 @@ import {IService} from "../System/IService";
 import { Observable, throwError } from 'rxjs';
 import { retry, flatMap, catchError } from 'rxjs/operators';
 
-import {ResponseVO} from "../../../vo/ResponseVO";
-import {DefaultAlertStructureVO} from "../../../vo/DefaultAlertStructureVO";
 import {Configuration} from "../../SetConfig";
-import { HttpClient, HttpEvent } from "@angular/common/http";
+import { DefaultAlertStructureVO, OverrideRequestDataVO, RequestVO, ResponseVO } from "ws-module-common";
+import { HttpClient } from "@angular/common/http";
 
 export class AbsBaseService extends AbsHandlerManager {
 
@@ -55,6 +52,7 @@ export class AbsBaseService extends AbsHandlerManager {
 
         let override_data: OverrideRequestDataVO = this.overrideRequestData(options);
         let response: Observable<T> = <Observable<T>><any>this.http.get<T>(url, options.config); // unknown pare non funzionare
+
 
         return this.setResponse<T>(options, url, override_data, response);
 

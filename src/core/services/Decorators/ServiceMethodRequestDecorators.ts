@@ -2,7 +2,7 @@
 
 import {RequestManager} from "../System/RequestManager";
 import {AbsListener} from "../Listener/AbsListener";
-import {RequestVO} from "../../../vo/RequestVO";
+import { RequestVO } from "ws-module-common";
 
 ///////////////////////////////////////////////////////////
 //////////////////// INTERFACES / ENUM ////////////////////
@@ -81,12 +81,12 @@ function before<R, L extends AbsListener>(originalMethod:any, scope:any) {
  * @param diocane
  * @returns {RequestManager<R, L>}
  */
-function after<R, L extends AbsListener>(endpoint:RequestVO, result:any, args:any, method:string, diocane:any) {
+function after<R, L extends AbsListener>(endpoint:RequestVO, result:any, args:any, method:string, _this:any) {
     console.log("result", result);
     endpoint["data"] = args[0];
     // FIXME: se uso questa ottengo: Untyped function calls may not accept type arguments
     // return this.setRequestGet<R, L>
-    return <RequestManager<R, L>>diocane["setRequest" + method](
+    return <RequestManager<R, L>>_this["setRequest" + method](
         args[0]["request_manager"],
         endpoint,
         result["success_handler"],
