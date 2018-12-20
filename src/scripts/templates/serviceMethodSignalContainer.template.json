@@ -1,0 +1,29 @@
+{
+  "txt":[
+    "import {Signal} from \"signals\";",
+    "import {AbsDecoratedSignal, ISignal} from \"ws-module-angular7\";",
+    "",
+    "/**",
+    " * ",
+    " */",
+    "export class {nome_srv_u}ServiceMethodSignalContainer {",
+      "",
+      "\tpublic on{nome_srv_u}ServiceSuccess:{nome_srv_u}ServiceMethodSignalDecorator<{nome_srv_u}ServiceMethodSignalContainer> =",
+        "\t\tnew {nome_srv_u}ServiceMethodSignalDecorator<{nome_srv_u}ServiceMethodSignalContainer>(new Signal(), this);",
+      "",
+      "\tpublic on{nome_srv_u}ServiceError:{nome_srv_u}ServiceMethodSignalDecorator<{nome_srv_u}ServiceMethodSignalContainer> =",
+        "\t\tnew {nome_srv_u}ServiceMethodSignalDecorator<{nome_srv_u}ServiceMethodSignalContainer>(new Signal(), this);",
+      "",
+      "\tconstructor() {}",
+    "}",
+    "",
+    "/**",
+    " * ",
+    " */",
+    "export class {nome_srv_u}ServiceMethodSignalDecorator<T> extends AbsDecoratedSignal<T> {",
+      "\tconstructor(decorated_signal:ISignal, container:T) {",
+        "\t\tsuper(decorated_signal, container);",
+      "\t}",
+    "}"
+  ]
+}

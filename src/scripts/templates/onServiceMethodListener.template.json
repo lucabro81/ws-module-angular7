@@ -1,0 +1,31 @@
+{
+  "txt": [
+    "import {AbsListener, IListener} from \"ws-module-angular7\"",
+    "",
+    "export abstract class On{nome_srv_u}ServiceMethodListener extends AbsListener {",
+      "",
+      "\tconstructor() {",
+        "\t\tsuper();",
+      "\t}",
+      "",
+      "\tpublic init(decorated_listener:IListener) {",
+        "\t\tsuper.init(decorated_listener);",
+      "\t}",
+      "",
+      "\tpublic onError(evt:any) {",
+        "\t\tconsole.log(\"On{nome_srv_u}ServiceMethodListener.onError\");",
+        "\t\tthis.decorated_listener.onError(evt);",
+      "\t}",
+      "",
+      "\tpublic onSuccess(evt:any) {",
+        "\t\tconsole.log(\"On{nome_srv_u}ServiceMethodListener.onSuccess\");",
+        "\t\tthis.decorated_listener.onSuccess(evt);",
+      "\t}",
+      "",
+      "\tpublic destroy() {",
+        "\t\tthis.decorated_listener.destroy();",
+      "\t}",
+      "",
+    "}"
+  ]
+}

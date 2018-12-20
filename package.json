@@ -1,22 +1,31 @@
 {
   "name": "ws-module-angular7",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
     "tsc": "tsc",
-    "build": "rm -rf package && npm run tsc",
+    "build": "rm -rf package && npm run tsc && npm run copyVo && npm run copyScripts",
+    "copyVo": "cp -r ./src/vo/ ./package/vo/",
+    "copyScripts": "cp -r ./src/scripts/ ./package/scripts/",
     "publishPackage": "npm run build && npm publish",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "postinstall": "node ./scripts/add_scripts.js"
   },
-  "author": "",
+  "bin": {
+    "add-web-service": "scripts/add_web_service.js",
+    "mod-web-service": "scripts/mod_web_service.js"
+  },
+  "author": "Luca Brognara",
   "license": "ISC",
   "dependencies": {
     "@angular/common": "^7.1.4",
     "@angular/core": "^7.1.4",
     "@angular/http": "^7.1.4",
     "@angular/platform-browser": "^7.1.4",
+    "lucabro-linked-list": "^1.0.29",
     "rxjs": "^6.3.3",
+    "signals": "^1.0.0",
+    "@types/signals": "^1.0.1",
     "zone.js": "^0.8.26"
   },
   "devDependencies": {

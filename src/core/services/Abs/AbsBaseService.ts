@@ -7,13 +7,13 @@ import {AbsListener} from "../Listener/AbsListener";
 import {AbsHandlerManager} from "./AbsHandlerManager";
 import {RequestManager} from "../System/RequestManager";
 import {IService} from "../System/IService";
-// import Observable = Rx.Observable;
-import { from } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { retry, flatMap, catchError } from 'rxjs/operators';
 
 import {ResponseVO} from "../../../vo/ResponseVO";
 import {DefaultAlertStructureVO} from "../../../vo/DefaultAlertStructureVO";
 import {Configuration} from "../../SetConfig";
-import { Observable } from "rxjs";
+import { HttpClient, HttpEvent } from "@angular/common/http";
 
 export class AbsBaseService extends AbsHandlerManager {
 
@@ -24,7 +24,7 @@ export class AbsBaseService extends AbsHandlerManager {
     /**
      *
      */
-    constructor() {
+    constructor(public http: HttpClient) {
         super()
     }
 
@@ -43,13 +43,20 @@ export class AbsBaseService extends AbsHandlerManager {
         console.log("registrazione richiesta", this);
 
         options.config.headers = this.setHeaders(options);
+        options.config.observe = 'body';
 
         let url:string = this.setSegmentedUrl(options.endpoint.url, options.data);
-        let override_data:OverrideRequestDataVO = this.overrideRequestData(options);
+        if (options.data && options.data.body) {
+            // parse body to query string
+            url += "?" + Object.keys(options.data.body).map(function (k) {
+                    return encodeURIComponent(k) + '=' + encodeURIComponent(options.data.body[k]);
+                }).join('&');
+        }
 
-        options.config.method = 'GET';
+        let override_data: OverrideRequestDataVO = this.overrideRequestData(options);
+        let response: Observable<T> = <Observable<T>><any>this.http.get<T>(url, options.config); // unknown pare non funzionare
 
-        return this.setResponse<T>(options, url, override_data, from(fetch(url, options.config)));
+        return this.setResponse<T>(options, url, override_data, response);
 
     }
 
@@ -74,41 +81,14 @@ export class AbsBaseService extends AbsHandlerManager {
             data = JSON.stringify(options.data);
         }
 
-        options.config.method = 'POST';
-        options.config.body = data;
+        if (options.data && options.data.body) {
+            data = options.data.body;
+        }
 
-        let override_data:OverrideRequestDataVO = this.overrideRequestData(options);
-        let response:Observable<T> = <Observable<T>>from(fetch(url, options.config));
+        let override_data: OverrideRequestDataVO = this.overrideRequestData(options);
+        let response: Observable<T> = <Observable<T>><any>this.http.post<T>(url, data, options.config);
 
         return this.setResponse<T>(options, url, override_data, response);
-    }
-
-    /**
-     *
-     * @param options
-     * @returns {Observable<Response>}
-     */
-    protected post(options:RequestVO):Observable<Response> {
-
-        options.config.headers = this.setHeaders(options);
-        options.config.method = 'POST';
-
-        let url:string;
-        let data:any;
-
-        if (options.data && options.data.segments) {
-            url = this.setSegmentedUrl(options.endpoint.url, options.data);
-            data = null;
-        }
-        else {
-            url = options.endpoint.url;
-            data = JSON.stringify(options.data);
-        }
-
-        options.config.method = 'POST';
-        options.config.body = data;
-
-        return from(fetch(url, options.config));
     }
 
     /**
@@ -119,30 +99,24 @@ export class AbsBaseService extends AbsHandlerManager {
     protected requestPut<T extends Response>(options:RequestVO):Observable<T> {
 
         options.config.headers = this.setHeaders(options);
-        options.config.method = 'PUT';
-        options.config.data = JSON.stringify(options.data);
 
-        let url:string = options.endpoint.url;
-        let override_data:OverrideRequestDataVO = this.overrideRequestData(options);
-        let response:Observable<T> = <Observable<T>>from(fetch(url, options.config));
+        let url: string;
+        let data: any = null;
+        if (options.data && options.data.segments) {
+            url = this.setSegmentedUrl(options.endpoint.url, options.data);
+        }
+        else {
+            url = options.endpoint.url;
+        }
+
+        if (options.data && options.data.body) {
+            data = options.data.body;
+        }
+
+        let override_data: OverrideRequestDataVO = this.overrideRequestData(options);
+        let response: Observable<T> = <Observable<T>><any>this.http.put(url, data, options.config);
 
         return this.setResponse<T>(options, url, override_data, response);
-    }
-
-    /**
-     *
-     * @param options
-     * @returns {Observable<Response>}
-     */
-    protected put(options:RequestVO):Observable<Response> {
-
-        let url:string = this.setSegmentedUrl(options.endpoint.url, options.data);
-
-        options.config.headers = this.setHeaders(options);
-        options.config.method = 'PUT';
-        options.config.data = JSON.stringify(options.data);
-
-        return from(fetch(url, options.config));
     }
 
     /**
@@ -153,30 +127,20 @@ export class AbsBaseService extends AbsHandlerManager {
     protected requestDelete<T extends Response>(options:RequestVO):Observable<T> {
 
         options.config.headers = this.setHeaders(options);
-        options.config.method = 'DELETE';
-        options.config.data = JSON.stringify(options.data);
 
-        let url:string = this.setSegmentedUrl(options.endpoint.url, options.data);
-        let override_data:OverrideRequestDataVO = this.overrideRequestData(options);
-        let response:Observable<T> = <Observable<T>>from(fetch(url, options.config));
+        let url: string = this.setSegmentedUrl(options.endpoint.url, options.data);
+
+        if (options.data && options.data.body) {
+            // parse body to query string
+            url += "?" + Object.keys(options.data.body).map(function (k) {
+                    return encodeURIComponent(k) + '=' + encodeURIComponent(options.data.body[k]);
+                }).join('&');
+        }
+
+        let override_data: OverrideRequestDataVO = this.overrideRequestData(options);
+        let response: Observable<T> = <Observable<T>><any>this.http.delete(url, options.config);
 
         return this.setResponse<T>(options, url, override_data, response);
-    }
-
-    /**
-     *
-     * @param options
-     * @returns {Observable<Response>}
-     */
-    protected delete(options:RequestVO):Observable<Response> {
-
-        let url:string = this.setSegmentedUrl(options.endpoint.url, options.data);
-
-        options.config.headers = this.setHeaders(options);
-        options.config.method = 'DELETE';
-        options.config.data = JSON.stringify(options.data);
-
-        return from(fetch(url, options.config));
     }
 
     /**
@@ -223,7 +187,7 @@ export class AbsBaseService extends AbsHandlerManager {
                    error_signals:Array<Signal>|undefined,
                    error_intercept:boolean|undefined,
                    error_callback:(() => void)|undefined,
-                   warning_level:WarningLevel, options:any):Observable<Response> {
+                   warning_level:WarningLevel, options:any):Observable<never> {
 
         // console.log("onError fine richiesta", error, options);
 
@@ -240,10 +204,10 @@ export class AbsBaseService extends AbsHandlerManager {
             error_json = error.json();
         }
         catch (e) {
-            return Observable.throw<Response>(new Error('Server error'));
+            return throwError(new Error('Server error'));
         }
 
-        return Observable.throw<Response>(error_json || 'Server error');
+        return throwError(error_json || 'Server error');
     }
 
     /**
@@ -408,21 +372,30 @@ export class AbsBaseService extends AbsHandlerManager {
                                             url:string,
                                             override_data:OverrideRequestDataVO,
                                             response:Observable<Response>):Observable<T> {
+
+        let pipes:Array<any> = [];
+
         if (override_data.retry > 0) {
-            response = response.retry(override_data.retry);
+            // response = response.retry(override_data.retry);
+            pipes.push(retry(override_data.retry));
         }
 
         // if (override_data.debounce > 0) {
         //     response = response.debounce(override_data.debounce).distinctUntilChanged();
         // }
 
-        // FIXME: flatmap ritorna un Observable<TResult...>
-        return <Observable<T>>response
-            .flatMap((response: T) => {
-                return this.onSuccess(response, url)
-            })
-            .catch((response: any) => this.onError(response, options.error_signals, options.error_intercept,
-                options.error_callback, override_data.warning_level, options));
+        pipes.push(flatMap((response: T) => {
+            return this.onSuccess(response, url)
+        }));
+
+        pipes.push(catchError((err: any) => this.onError(err, options.error_signals, options.error_intercept,
+            options.error_callback, override_data.warning_level, options)));
+
+        // type Parameters<T> = T extends (...args: infer U) => any ? U : never;
+
+        return <Observable<T>>response.pipe.apply(null, pipes); // ma dioc...
+            // .catch((response: any) => this.onError(response, options.error_signals, options.error_intercept,
+            //     options.error_callback, override_data.warning_level, options));
     }
 
     /**
