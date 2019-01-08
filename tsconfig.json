@@ -1,14 +1,15 @@
 {
   "compilerOptions": {
-    "module": "CommonJS",
-    "target": "es6",
+    "module": "es2015",
+    "target": "ES5",
     "outDir": "package",
     "rootDir": "./src",
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "lib": ["es2015", "dom"]
   },
   "exclude": [
     "node_modules"

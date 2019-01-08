@@ -140,7 +140,6 @@ export class RequestManager<R, T extends AbsListener> {
      * Set a listener object for the current request
      *
      * @param listener_decorator
-     * @param id
      * @returns {RequestManager}
      */
     public setListener(listener_decorator: T): RequestManager<R, T> {
@@ -238,17 +237,19 @@ export class RequestManager<R, T extends AbsListener> {
     }
 
     /**
-     * Run the current request (you've to set a id_request)
      *
+     * @param id_request
      * @param debounce
      */
-    public run(debounce?: number) {
+    public runWithDebounce(id_request:string, debounce?: number) {
+        // console.log("RequestManager - runWithDebounce - id_request >>> ", id_request);
 
-        if (!this.id_request) {
-            this.id_request = "id_" + RequestManager.id_index++;
+        if (id_request) {
+            this.id_request = id_request;
         }
-
-        RequestManager.request_manager_list[this.id_request].destroy();
+        else {
+            throw new Error('id_request deve essere una stringa valida!');
+        }
 
         if (!RequestManager.subject_cont[this.id_request]) {
             RequestManager.subject_cont[this.id_request] = new Subject<GetListServiceParamsVO>();
@@ -256,7 +257,7 @@ export class RequestManager<R, T extends AbsListener> {
             RequestManager.subject_cont[this.id_request]
                 .asObservable()
                 .pipe(
-                    debounceTime((debounce) ? debounce : 0),
+                    debounceTime((debounce)),
                     distinctUntilChanged()
                 )
                 .subscribe((params: GetListServiceParamsVO) => {
@@ -278,12 +279,12 @@ export class RequestManager<R, T extends AbsListener> {
 
                                     public onError(evt: any, callback:() => void) {
                                         this.decorated_listener.onError(evt, callback);
-                                        callback();
+                                        // callback();
                                     }
 
                                     public onSuccess(evt: any, callback:() => void) {
                                         this.decorated_listener.onSuccess(evt, callback);
-                                        callback();
+                                        // callback();
                                     }
 
                                     public destroy() {
@@ -314,6 +315,68 @@ export class RequestManager<R, T extends AbsListener> {
         }
 
         RequestManager.subject_cont[this.id_request].next();
+    }
+
+    /**
+     * Run the current request
+     *
+     */
+    public run() {
+
+        if (!this.id_request) {
+            this.id_request = "id_" + RequestManager.id_index++;
+        }
+
+        console.log("debug run this.id_request", this, this.id_request);
+
+        // if the current id doesn't match with stored ones in the listener queue,
+        // a default listener is created
+        if (!this.checkListenerIdRequest()) {
+            RequestManager.listener_decorator.push(
+                {
+                    id: this.id_request,
+                    listener: new class extends AbsListener {
+                        constructor() {
+                            super();
+                        }
+
+                        public init(decorated_listener: IListener) {
+                            super.init(decorated_listener);
+                        }
+
+                        public onError(evt: any, callback:() => void) {
+                            this.decorated_listener.onError(evt, callback);
+                            // callback();
+                        }
+
+                        public onSuccess(evt: any, callback:() => void) {
+                            this.decorated_listener.onSuccess(evt, callback);
+                            // callback();
+                        }
+
+                        public destroy() {
+                            this.decorated_listener.destroy();
+                        }
+                    }
+                });
+        }
+
+        let l: number = RequestManager.listener_decorator.length;
+        for (let i = 0; i < l; i++) {
+            RequestManager.listener_decorator[i].listener.init(new Listener());
+        }
+
+        if (this.is_synchronized) {
+            RequestManager.request_queue_list.addElem({subscribe: this.setSubscribe, scope: this});
+
+            if (RequestManager.request_queue_list.length() === 1) {
+                return RequestManager.request_queue_list.start.data.subscribe();
+            }
+
+        }
+        else {
+            this.setSubscribe();
+        }
     }
 
     /**
@@ -451,7 +514,7 @@ export class RequestManager<R, T extends AbsListener> {
      */
     private setSubscribe() {
 
-        console.log("inizia richiesta", this.scope);
+        console.log("inizia richiesta", this, this.scope);
         // if (this.scope.onStartRequest) {
             this.scope.onStartRequest(this.scope);
 

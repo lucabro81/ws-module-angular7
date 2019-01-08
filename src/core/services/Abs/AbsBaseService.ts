@@ -1,4 +1,3 @@
-import { WarningLevel } from "../../../utils/Emun";
 import { Signal } from "signals";
 
 import {AbsListener} from "../Listener/AbsListener";
@@ -9,7 +8,7 @@ import { Observable, throwError } from 'rxjs';
 import { retry, flatMap, catchError } from 'rxjs/operators';
 
 import {Configuration} from "../../SetConfig";
-import { DefaultAlertStructureVO, OverrideRequestDataVO, RequestVO, ResponseVO } from "ws-module-common";
+import { DefaultAlertStructureVO, OverrideRequestDataVO, RequestVO, ResponseVO, WarningLevel } from "ws-module-common";
 import { HttpClient } from "@angular/common/http";
 
 export class AbsBaseService extends AbsHandlerManager {
@@ -322,7 +321,7 @@ export class AbsBaseService extends AbsHandlerManager {
 
         service_obj.signals = new signal_container();
 
-        service_obj.properties = new testSrvProperties();
+        service_obj.data = new testSrvProperties();
 
         return service_obj;
     }
@@ -391,7 +390,7 @@ export class AbsBaseService extends AbsHandlerManager {
 
         // type Parameters<T> = T extends (...args: infer U) => any ? U : never;
 
-        return <Observable<T>>response.pipe.apply(null, pipes); // ma dioc...
+        return <Observable<T>>response.pipe.apply(response, pipes); // ma dioc...
             // .catch((response: any) => this.onError(response, options.error_signals, options.error_intercept,
             //     options.error_callback, override_data.warning_level, options));
     }

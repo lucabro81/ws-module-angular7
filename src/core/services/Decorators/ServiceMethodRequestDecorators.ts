@@ -63,11 +63,12 @@ function before<R, L extends AbsListener>(originalMethod:any, scope:any) {
         args[i] = arguments[i];
     }
 
-    console.log("before args", arguments);
 
     let request_manager: RequestManager<R, L> =
         new RequestManager<R, L>();
     args[0]["request_manager"] = request_manager;
+    console.log("debug before args", args);
+    console.log("debug before scope", scope);
 
     return { originalMethod: originalMethod.apply(scope, args), args:args};
 }
@@ -78,17 +79,21 @@ function before<R, L extends AbsListener>(originalMethod:any, scope:any) {
  * @param result
  * @param args
  * @param method
- * @param diocane
+ * @param _this
  * @returns {RequestManager<R, L>}
  */
-function after<R, L extends AbsListener>(endpoint:RequestVO, result:any, args:any, method:string, _this:any) {
+function after<R, L extends AbsListener>(options:RequestVO, result:any, args:any, method:string, _this:any) {
     console.log("result", result);
-    endpoint["data"] = args[0];
+    options["data"] = args[0];
     // FIXME: se uso questa ottengo: Untyped function calls may not accept type arguments
     // return this.setRequestGet<R, L>
+
+    console.log("debug after \"setRequest\" + method", "setRequest" + method);
+    console.log("debug after _this", _this);
+
     return <RequestManager<R, L>>_this["setRequest" + method](
         args[0]["request_manager"],
-        endpoint,
+        options,
         result["success_handler"],
         result["error_handler"]
     );
@@ -114,11 +119,11 @@ function storeData(item:any, data:any, scope:any) {
 
 /**
  *
- * @param endpoint
+ * @param options
  * @returns {(target:Object, key:string, descriptor:any)=>TypedPropertyDescriptor<(params:any)=>RequestManager<R, L>>}
  * @constructor
  */
-export function Post<R, L extends AbsListener>(endpoint:RequestVO):(
+export function Post<R, L extends AbsListener>(options:RequestVO):(
     target: Object,
     key: string,
     descriptor: any)=> TypedPropertyDescriptor<(params:any) => RequestManager<R, L>> {
@@ -132,7 +137,7 @@ export function Post<R, L extends AbsListener>(endpoint:RequestVO):(
 
         descriptor.value = function () {
             let result = before(originalMethod, this);
-            return after<R, L>(endpoint, result.originalMethod, result.args, "POST", this);
+            return after<R, L>(options, result.originalMethod, result.args, "POST", this);
         };
 
         return descriptor;
@@ -141,11 +146,11 @@ export function Post<R, L extends AbsListener>(endpoint:RequestVO):(
 
 /**
  *
- * @param endpoint
+ * @param options
  * @returns {(target:Object, key:string, descriptor:any)=>TypedPropertyDescriptor<(params:any)=>RequestManager<R, L>>}
  * @constructor
  */
-export function Get<R, L extends AbsListener>(endpoint:RequestVO):(
+export function Get<R, L extends AbsListener>(options:RequestVO):(
     target: Object,
     key: string,
     descriptor: any)=> TypedPropertyDescriptor<(params:any) => RequestManager<R, L>> {
@@ -159,8 +164,10 @@ export function Get<R, L extends AbsListener>(endpoint:RequestVO):(
 
         descriptor.value = function () {
             let result = before(originalMethod, this);
-            return after<R, L>(endpoint, result.originalMethod, result.args, "GET", this);
+            return after<R, L>(options, result.originalMethod, result.args, "GET", this);
         };
+
+        console.log("debug Get", descriptor);
 
         return descriptor;
     }

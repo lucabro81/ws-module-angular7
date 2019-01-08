@@ -1,8 +1,7 @@
 import {AbsListener} from "../Listener/AbsListener";
-import {WarningLevel} from "../../../utils/Emun";
 import {RequestManager} from "../System/RequestManager";
 import {Configuration} from "../../SetConfig";
-import { RequestVO, ResponseVO } from "ws-module-common";
+import { RequestVO, ResponseVO, WarningLevel } from "ws-module-common";
 
 export class AbsHandlerManager {
 
@@ -53,7 +52,7 @@ export class AbsHandlerManager {
      */
     protected presentLoadingDefault() {
         AbsHandlerManager.is_loading_active = true;
-        if (Configuration.defaultLoading.enable) {
+        if (Configuration.defaultLoading && Configuration.defaultLoading.enable) {
             Configuration.defaultLoading.presentLoadingDefault();
         }
     }
@@ -63,7 +62,7 @@ export class AbsHandlerManager {
      */
     protected dismissLoadingDefault() {
         AbsHandlerManager.is_loading_active = false;
-        if (Configuration.defaultLoading.enable) {
+        if (Configuration.defaultLoading && Configuration.defaultLoading.enable) {
             Configuration.defaultLoading.dismissLoadingDefault();
         }
     }

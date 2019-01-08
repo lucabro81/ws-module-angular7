@@ -1,6 +1,6 @@
 {
   "name": "ws-module-angular7",
-  "version": "0.0.18",
+  "version": "0.0.32",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -26,7 +26,7 @@
     "lucabro-linked-list": "^1.0.29",
     "rxjs": "^6.3.3",
     "signals": "^1.0.0",
-    "ws-module-common": "0.0.1",
+    "ws-module-common": "0.0.5",
     "zone.js": "^0.8.26"
   },
   "devDependencies": {

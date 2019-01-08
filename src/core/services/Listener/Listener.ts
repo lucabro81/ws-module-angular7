@@ -6,12 +6,14 @@ export class Listener implements IListener {
 
     }
 
-    public onError(evt:any):void {
+    public onError(evt:any, callback:() => void):void {
         // console.log("Listener onError");
+        callback();
     }
 
-    public onSuccess(evt:any):void {
+    public onSuccess(evt:any, callback:() => void):void {
         // console.log("Listener onSuccess");
+        callback();
     }
 
     public destroy():void {
